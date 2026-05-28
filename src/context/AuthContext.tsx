@@ -1,13 +1,16 @@
 import React, { createContext, useContext, useState, useCallback } from 'react';
 
-export type UserRole = 'USER' | 'ADMIN';
+export type UserRole = 'ROLE_USER' | 'ROLE_ADMIN';
 
 export interface AuthUser {
-  token: string;
+  accessToken: string;
+  refreshToken: string;
   role: UserRole;
-  userId: number;
+  userId: string;
   email: string;
-  fullName?: string;
+  fullName: string;
+  status: string;
+  userType: string;
 }
 
 interface AuthContextValue {
@@ -50,7 +53,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       value={{
         user,
         isAuthenticated: !!user,
-        isAdmin: user?.role === 'ADMIN',
+        isAdmin: user?.role === 'ROLE_ADMIN',
         login,
         logout,
       }}

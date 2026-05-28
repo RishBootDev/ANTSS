@@ -15,7 +15,7 @@ export function ProtectedRoute({ children, allowedRole }: ProtectedRouteProps) {
 
   if (allowedRole && user.role !== allowedRole) {
     // If Admin attempts to access user area, or User attempts admin area, redirect
-    return <Navigate to={user.role === 'ADMIN' ? '/admin' : '/dashboard'} replace />;
+    return <Navigate to={user.role === 'ROLE_ADMIN' ? '/admin' : '/dashboard'} replace />;
   }
 
   return <>{children}</>;

@@ -57,7 +57,7 @@ export function AdminDashboard() {
   const [pkgFeatures, setPkgFeatures] = useState('');
   const [pkgActive, setPkgActive] = useState(true);
 
-  const token = user?.token || '';
+  const token = user?.accessToken || '';
 
   const loadData = async () => {
     setLoading(true);

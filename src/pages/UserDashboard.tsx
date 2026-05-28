@@ -6,8 +6,6 @@ import {
   addHospital,
   updateHospital,
   getClinics,
-  addClinic,
-  updateClinic,
   getDoctors,
   type Hospital,
   type Clinic,
@@ -29,6 +27,9 @@ import {
   Shield,
   Loader2
 } from 'lucide-react';
+import ClinicTab from '../components/clinics/ClinicTab';
+import SubscriptionTab from '../components/subscriptions/SubscriptionTab';
+import DoctorTab from '../components/doctors/DoctorTab';
 
 type Tab = 'overview' | 'hospitals' | 'clinics' | 'doctors' | 'subscription';
 
@@ -54,7 +55,7 @@ export function UserDashboard() {
   const [formState, setFormState] = useState('');
   const [formPincode, setFormPincode] = useState('');
   
-  const token = user?.token || '';
+  const token = user?.accessToken || '';
 
   const fetchData = async () => {
     setLoading(true);
@@ -124,8 +125,6 @@ export function UserDashboard() {
           city: formCity,
           state: formState,
           pincode: formPincode,
-          allowedDoctors: 5,
-          active: true
         };
 
         if (editingItem) {
@@ -137,29 +136,6 @@ export function UserDashboard() {
           const res = await addHospital(token, payload);
           if (res.success && res.data) {
             setHospitals([...hospitals, res.data]);
-          }
-        }
-      } else {
-        const payload = {
-          clinicName: formName,
-          mobileNumber: formPhone,
-          addressLine1: formAddress,
-          city: formCity,
-          state: formState,
-          pincode: formPincode,
-          allowedDoctors: 3,
-          active: true
-        };
-
-        if (editingItem) {
-          const res = await updateClinic(token, editingItem.id, payload);
-          if (res.success && res.data) {
-            setClinics(clinics.map(c => c.id === editingItem.id ? res.data! : c));
-          }
-        } else {
-          const res = await addClinic(token, payload);
-          if (res.success && res.data) {
-            setClinics([...clinics, res.data]);
           }
         }
       }
@@ -180,7 +156,38 @@ export function UserDashboard() {
     );
   }
 
-  const userStatus = profile?.status || 'APPROVED'; // default fallback for UI demo
+  const userStatus = user?.status || 'APPROVED';
+
+  if (userStatus === 'PENDING') {
+    return (
+      <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center text-white px-4">
+        <div className="bg-slate-900/60 backdrop-blur-xl border border-white/10 p-8 rounded-3xl max-w-md text-center shadow-2xl">
+          <Clock className="w-16 h-16 text-amber-500 mx-auto mb-4 animate-pulse" />
+          <h2 className="text-2xl font-bold mb-2">Awaiting Approval</h2>
+          <p className="text-gray-400 mb-8 text-sm">
+            Your registration is currently under manual review by our administration team. 
+            Once verified, your access credentials and workspace will be unlocked.
+          </p>
+          <button 
+            onClick={logout} 
+            className="w-full bg-white/5 hover:bg-white/10 text-white font-medium py-3 rounded-xl transition-all"
+          >
+            Log Out
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  const renderStatusBadge = (status?: string) => {
+    if (status === 'APPROVED' || status === 'ACTIVE') {
+      return <span className="text-emerald-400 font-medium bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">APPROVED</span>;
+    }
+    if (status === 'REJECTED') {
+      return <span className="text-red-400 font-medium bg-red-500/10 px-2 py-0.5 rounded border border-red-500/20">REJECTED</span>;
+    }
+    return <span className="text-amber-400 font-medium bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20 uppercase">Pending Approval</span>;
+  };
 
   return (
     <div className="min-h-screen bg-slate-950 text-white flex">
@@ -400,8 +407,8 @@ export function UserDashboard() {
                       </div>
 
                       <div className="mt-5 pt-3 border-t border-white/5 flex items-center justify-between text-xs">
-                        <span className="text-gray-500">Allowed Doctors Limit: {hosp.allowedDoctors ?? 5}</span>
-                        <span className="text-emerald-400 font-medium bg-emerald-500/10 px-2 py-0.5 rounded">Active</span>
+                        <span className="text-gray-500">Allowed Doctors Limit: {hosp.maxDoctorLimit ?? '-'}</span>
+                        {renderStatusBadge(hosp.status)}
                       </div>
                     </div>
                   ))}
@@ -412,123 +419,25 @@ export function UserDashboard() {
 
           {/* TAB 3: CLINICS */}
           {activeTab === 'clinics' && (
-            <div className="space-y-6">
-              <div className="flex justify-between items-center">
-                <h3 className="text-lg font-semibold">Registered Clinics</h3>
-                <button
-                  onClick={() => openAddModal('clinic')}
-                  className="flex items-center gap-2 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 px-4 py-2 rounded-lg font-medium text-sm transition-all"
-                >
-                  <Plus className="w-4 h-4" /> Add Clinic
-                </button>
-              </div>
-
-              {clinics.length === 0 ? (
-                <div className="text-center py-12 bg-slate-900/40 rounded-2xl border border-white/5">
-                  <Stethoscope className="w-12 h-12 text-gray-600 mx-auto mb-3" />
-                  <p className="text-gray-400 text-sm">No clinics added yet. Create one now!</p>
-                </div>
-              ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {clinics.map((clinic) => (
-                    <div key={clinic.id} className="bg-slate-900/60 border border-white/10 p-5 rounded-2xl flex flex-col justify-between hover:border-orange-500/30 transition-colors">
-                      <div>
-                        <div className="flex justify-between items-start">
-                          <h4 className="font-semibold text-lg text-white">{clinic.clinicName}</h4>
-                          <button
-                            onClick={() => openEditModal('clinic', clinic)}
-                            className="p-1.5 rounded-lg bg-slate-800 text-gray-400 hover:text-white transition-colors"
-                          >
-                            <Edit2 className="w-4 h-4" />
-                          </button>
-                        </div>
-
-                        <div className="mt-4 space-y-2 text-sm text-gray-400">
-                          {clinic.mobileNumber && (
-                            <div className="flex items-center gap-2"><Phone className="w-4 h-4 text-orange-400" /> {clinic.mobileNumber}</div>
-                          )}
-                          <div className="flex items-start gap-2">
-                            <MapPin className="w-4 h-4 text-orange-400 shrink-0 mt-0.5" />
-                            <span>{clinic.addressLine1 || 'No address'}, {clinic.city}, {clinic.state} {clinic.pincode}</span>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="mt-5 pt-3 border-t border-white/5 flex items-center justify-between text-xs">
-                        <span className="text-gray-500">Allowed Doctors Limit: {clinic.allowedDoctors ?? 3}</span>
-                        <span className="text-emerald-400 font-medium bg-emerald-500/10 px-2 py-0.5 rounded">Active</span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
+            <ClinicTab 
+              clinics={clinics} 
+              token={token} 
+              onClinicsUpdate={setClinics} 
+            />
           )}
 
           {/* TAB 4: DOCTORS */}
           {activeTab === 'doctors' && (
-            <div className="space-y-6">
-              <h3 className="text-lg font-semibold">Associated Doctors</h3>
-
-              {doctors.length === 0 ? (
-                <div className="text-center py-12 bg-slate-900/40 rounded-2xl border border-white/5">
-                  <Users className="w-12 h-12 text-gray-600 mx-auto mb-3" />
-                  <p className="text-gray-400 text-sm">No doctors associated with your subscription yet.</p>
-                </div>
-              ) : (
-                <div className="bg-slate-900/60 border border-white/10 rounded-2xl overflow-hidden">
-                  <table className="w-full text-left border-collapse">
-                    <thead>
-                      <tr className="border-b border-white/5 bg-slate-900 text-xs font-semibold uppercase text-gray-400">
-                        <th className="p-4">Name</th>
-                        <th className="p-4">Email</th>
-                        <th className="p-4">Mobile</th>
-                        <th className="p-4">Specialization</th>
-                        <th className="p-4 text-right">Status</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-white/5 text-sm">
-                      {doctors.map((doc) => (
-                        <tr key={doc.id} className="hover:bg-white/[0.02]">
-                          <td className="p-4 font-medium text-white">{doc.fullName}</td>
-                          <td className="p-4 text-gray-400">{doc.email}</td>
-                          <td className="p-4 text-gray-400">{doc.mobileNumber || '-'}</td>
-                          <td className="p-4 text-gray-400">{doc.specialization || 'General Practice'}</td>
-                          <td className="p-4 text-right">
-                            <span className="text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-full text-xs font-medium">Active</span>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
-            </div>
+            <DoctorTab
+              doctors={doctors}
+              token={token}
+              onDoctorsUpdate={setDoctors}
+            />
           )}
 
           {/* TAB 5: SUBSCRIPTION */}
           {activeTab === 'subscription' && (
-            <div className="bg-slate-900/60 border border-white/10 p-6 rounded-2xl max-w-xl">
-              <h3 className="text-lg font-semibold mb-4">Current Package Details</h3>
-              <div className="space-y-4">
-                <div className="flex justify-between border-b border-white/5 pb-2 text-sm">
-                  <span className="text-gray-400">Package Name:</span>
-                  <span className="text-white font-semibold">Prescription Package</span>
-                </div>
-                <div className="flex justify-between border-b border-white/5 pb-2 text-sm">
-                  <span className="text-gray-400">Duration:</span>
-                  <span className="text-white">YEARLY</span>
-                </div>
-                <div className="flex justify-between border-b border-white/5 pb-2 text-sm">
-                  <span className="text-gray-400">Base Price:</span>
-                  <span className="text-white font-mono">₹ 15,000</span>
-                </div>
-                <div className="flex justify-between border-b border-white/5 pb-2 text-sm">
-                  <span className="text-gray-400">Pricing Mode:</span>
-                  <span className="text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded text-xs">Standard Plan</span>
-                </div>
-              </div>
-            </div>
+            <SubscriptionTab token={token} />
           )}
         </div>
       </main>

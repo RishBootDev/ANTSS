@@ -2,7 +2,7 @@
  * Package types matching backend PackageResponse DTO
  * (com.antss_prescription.dto.response.PackageResponse)
  */
-export type DurationType = 'MONTHLY' | 'QUARTERLY' | 'YEARLY' | 'LIFETIME';
+export type DurationType = 'MONTHLY' | 'QUARTERLY' | 'SIX_MONTH' | 'ONE_YEAR' | 'TWO_YEAR' | 'YEARLY' | 'LIFETIME';
 
 export type Package = {
   id: number;

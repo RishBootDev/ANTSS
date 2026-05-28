@@ -26,15 +26,18 @@ export function LoginPage() {
       const res = await loginUser(email, password);
       if (res.success && res.data) {
         login({
-          token: res.data.token,
-          role: res.data.role,
-          userId: res.data.userId,
-          email: res.data.email,
-          fullName: res.data.fullName,
+          accessToken: res.data.accessToken,
+          refreshToken: res.data.refreshToken,
+          role: res.data.user.role,
+          userId: res.data.user.id,
+          email: res.data.user.email,
+          fullName: res.data.user.fullName,
+          status: res.data.user.status,
+          userType: res.data.user.userType,
         });
 
         // Redirect based on role
-        if (res.data.role === 'ADMIN') {
+        if (res.data.user.role === 'ROLE_ADMIN') {
           navigate('/admin');
         } else {
           navigate('/dashboard');
