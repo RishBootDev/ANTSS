@@ -85,11 +85,20 @@ export async function register(
 }
 
 export type LoginResponse = {
-  token: string;
-  role: 'USER' | 'ADMIN';
-  userId: number;
-  email: string;
-  fullName?: string;
+  accessToken: string;
+  refreshToken: string;
+  tokenType: string;
+  user: {
+    id: string;
+    fullName: string;
+    email: string;
+    mobileNumber: string;
+    userType: string;
+    status: string;
+    role: 'ROLE_USER' | 'ROLE_ADMIN';
+    registrationDate: string;
+    createdAt: string;
+  };
 };
 
 /**
