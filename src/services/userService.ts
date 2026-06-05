@@ -1,4 +1,5 @@
 import type { ApiResponse } from './authService';
+import { API_BASE } from '@/lib/apiClient';
 
 export interface Hospital {
   id: number;
@@ -56,7 +57,7 @@ function getHeaders(token: string) {
 }
 
 export async function getProfile(token: string): Promise<ApiResponse> {
-  const res = await fetch('/api/user/profile', {
+  const res = await fetch(`${API_BASE}/user/profile`, {
     headers: getHeaders(token),
   });
   const body = await res.json().catch(() => ({}));
@@ -68,7 +69,7 @@ export async function getProfile(token: string): Promise<ApiResponse> {
 }
 
 export async function getHospitals(token: string): Promise<ApiResponse<Hospital[]>> {
-  const res = await fetch('/api/hospitals', {
+  const res = await fetch(`${API_BASE}/hospitals`, {
     headers: getHeaders(token),
   });
   const body = await res.json().catch(() => ({}));
@@ -80,7 +81,7 @@ export async function getHospitals(token: string): Promise<ApiResponse<Hospital[
 }
 
 export async function addHospital(token: string, hospital: Omit<Hospital, 'id'>): Promise<ApiResponse<Hospital>> {
-  const res = await fetch('/api/hospitals', {
+  const res = await fetch(`${API_BASE}/hospitals`, {
     method: 'POST',
     headers: getHeaders(token),
     body: JSON.stringify(hospital),
@@ -94,7 +95,7 @@ export async function addHospital(token: string, hospital: Omit<Hospital, 'id'>)
 }
 
 export async function updateHospital(token: string, id: number, hospital: Partial<Hospital>): Promise<ApiResponse<Hospital>> {
-  const res = await fetch(`/api/hospitals/${id}`, {
+  const res = await fetch(`${API_BASE}/hospitals/${id}`, {
     method: 'PUT',
     headers: getHeaders(token),
     body: JSON.stringify(hospital),
@@ -108,7 +109,7 @@ export async function updateHospital(token: string, id: number, hospital: Partia
 }
 
 export async function getClinics(token: string): Promise<ApiResponse<Clinic[]>> {
-  const res = await fetch('/api/clinics', {
+  const res = await fetch(`${API_BASE}/clinics`, {
     headers: getHeaders(token),
   });
   const body = await res.json().catch(() => ({}));
@@ -120,7 +121,7 @@ export async function getClinics(token: string): Promise<ApiResponse<Clinic[]>> 
 }
 
 export async function addClinic(token: string, clinic: Omit<Clinic, 'id'>): Promise<ApiResponse<Clinic>> {
-  const res = await fetch('/api/clinics', {
+  const res = await fetch(`${API_BASE}/clinics`, {
     method: 'POST',
     headers: getHeaders(token),
     body: JSON.stringify(clinic),
@@ -134,7 +135,7 @@ export async function addClinic(token: string, clinic: Omit<Clinic, 'id'>): Prom
 }
 
 export async function updateClinic(token: string, id: number, clinic: Partial<Clinic>): Promise<ApiResponse<Clinic>> {
-  const res = await fetch(`/api/clinics/${id}`, {
+  const res = await fetch(`${API_BASE}/clinics/${id}`, {
     method: 'PUT',
     headers: getHeaders(token),
     body: JSON.stringify(clinic),
@@ -148,7 +149,7 @@ export async function updateClinic(token: string, id: number, clinic: Partial<Cl
 }
 
 export async function getDoctors(token: string): Promise<ApiResponse<Doctor[]>> {
-  const res = await fetch('/api/doctors', {
+  const res = await fetch(`${API_BASE}/doctors`, {
     headers: getHeaders(token),
   });
   const body = await res.json().catch(() => ({}));
@@ -160,7 +161,7 @@ export async function getDoctors(token: string): Promise<ApiResponse<Doctor[]>> 
 }
 
 export async function addDoctor(token: string, doctor: Partial<Doctor>): Promise<ApiResponse<Doctor>> {
-  const res = await fetch('/api/doctors', {
+  const res = await fetch(`${API_BASE}/doctors`, {
     method: 'POST',
     headers: getHeaders(token),
     body: JSON.stringify(doctor),
@@ -174,7 +175,7 @@ export async function addDoctor(token: string, doctor: Partial<Doctor>): Promise
 }
 
 export async function updateDoctor(token: string, id: string, doctor: Partial<Doctor>): Promise<ApiResponse<Doctor>> {
-  const res = await fetch(`/api/doctors/${id}`, {
+  const res = await fetch(`${API_BASE}/doctors/${id}`, {
     method: 'PUT',
     headers: getHeaders(token),
     body: JSON.stringify(doctor),

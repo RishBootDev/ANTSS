@@ -1,6 +1,7 @@
 import type { ApiResponse } from './authService';
 import type { Hospital, Clinic } from './userService';
 import type { Package } from './packageService';
+import { API_BASE } from '@/lib/apiClient';
 
 export interface AdminUserResponse {
   id: string; // backend uses UUID
@@ -57,8 +58,7 @@ function getHeaders(token: string) {
   };
 }
 
-// API base — use Vite environment variable VITE_API_BASE if provided, fallback to '/api'
-const API_BASE = (import.meta.env?.VITE_API_BASE as string) ?? '/api';
+
 
 /**
  * getAllUsers
@@ -99,7 +99,7 @@ export async function getAllUsers(token: string): Promise<ApiResponse<AdminUserR
 }
 
 export async function getUsers(token: string): Promise<ApiResponse<AdminUserResponse[]>> {
-  const res = await fetch('/api/admin/registrations/pending', {
+  const res = await fetch(`${API_BASE}/admin/registrations/pending`, {
     headers: getHeaders(token),
   });
   const body = await res.json().catch(() => ({}));
@@ -111,7 +111,7 @@ export async function getUsers(token: string): Promise<ApiResponse<AdminUserResp
 }
 
 export async function approveUser(token: string, userId: string): Promise<ApiResponse<AdminUserResponse>> {
-  const res = await fetch(`/api/admin/users/${userId}/approve`, {
+  const res = await fetch(`${API_BASE}/admin/users/${userId}/approve`, {
     method: 'POST',
     headers: getHeaders(token),
   });
@@ -124,7 +124,7 @@ export async function approveUser(token: string, userId: string): Promise<ApiRes
 }
 
 export async function rejectUser(token: string, userId: string): Promise<ApiResponse<AdminUserResponse>> {
-  const res = await fetch(`/api/admin/users/${userId}/reject`, {
+  const res = await fetch(`${API_BASE}/admin/users/${userId}/reject`, {
     method: 'POST',
     headers: getHeaders(token),
   });
@@ -137,7 +137,7 @@ export async function rejectUser(token: string, userId: string): Promise<ApiResp
 }
 
 export async function modifyUserPackage(token: string, userId: string, packageId: number): Promise<ApiResponse<AdminUserResponse>> {
-  const res = await fetch(`/api/admin/users/${userId}/package`, {
+  const res = await fetch(`${API_BASE}/admin/users/${userId}/package`, {
     method: 'PUT',
     headers: getHeaders(token),
     body: JSON.stringify({ packageId }),
@@ -151,7 +151,7 @@ export async function modifyUserPackage(token: string, userId: string, packageId
 }
 
 export async function extendUserValidity(token: string, userId: string, days: number): Promise<ApiResponse<AdminUserResponse>> {
-  const res = await fetch(`/api/admin/users/${userId}/extend`, {
+  const res = await fetch(`${API_BASE}/admin/users/${userId}/extend`, {
     method: 'PUT',
     headers: getHeaders(token),
     body: JSON.stringify({ days }),
@@ -165,7 +165,7 @@ export async function extendUserValidity(token: string, userId: string, days: nu
 }
 
 export async function blockUser(token: string, userId: string): Promise<ApiResponse<AdminUserResponse>> {
-  const res = await fetch(`/api/admin/users/${userId}/block`, {
+  const res = await fetch(`${API_BASE}/admin/users/${userId}/block`, {
     method: 'PUT',
     headers: getHeaders(token),
   });
@@ -178,7 +178,7 @@ export async function blockUser(token: string, userId: string): Promise<ApiRespo
 }
 
 export async function unblockUser(token: string, userId: string): Promise<ApiResponse<AdminUserResponse>> {
-  const res = await fetch(`/api/admin/users/${userId}/unblock`, {
+  const res = await fetch(`${API_BASE}/admin/users/${userId}/unblock`, {
     method: 'PUT',
     headers: getHeaders(token),
   });
@@ -207,7 +207,7 @@ export async function getAdminClinics(_token: string): Promise<ApiResponse<Clini
 }
 
 export async function createAdminPackage(token: string, pkg: Omit<Package, 'id'>): Promise<ApiResponse<Package>> {
-  const res = await fetch('/api/packages', {
+  const res = await fetch(`${API_BASE}/packages`, {
     method: 'POST',
     headers: getHeaders(token),
     body: JSON.stringify(pkg),
@@ -221,7 +221,7 @@ export async function createAdminPackage(token: string, pkg: Omit<Package, 'id'>
 }
 
 export async function updateAdminPackage(token: string, id: number, pkg: Partial<Package>): Promise<ApiResponse<Package>> {
-  const res = await fetch(`/api/packages/${id}`, {
+  const res = await fetch(`${API_BASE}/packages/${id}`, {
     method: 'PUT',
     headers: getHeaders(token),
     body: JSON.stringify(pkg),
@@ -249,7 +249,7 @@ export async function getAdminStats(_token: string): Promise<ApiResponse<AdminSt
 }
 
 export async function getPendingAddons(token: string): Promise<ApiResponse<DoctorAddonResponse[]>> {
-  const res = await fetch('/api/admin/addons/pending', {
+  const res = await fetch(`${API_BASE}/admin/addons/pending`, {
     headers: getHeaders(token),
   });
   const body = await res.json().catch(() => ({}));
@@ -261,7 +261,7 @@ export async function getPendingAddons(token: string): Promise<ApiResponse<Docto
 }
 
 export async function approveAddon(token: string, addonId: number): Promise<ApiResponse<DoctorAddonResponse>> {
-  const res = await fetch(`/api/admin/addons/${addonId}/approve`, {
+  const res = await fetch(`${API_BASE}/admin/addons/${addonId}/approve`, {
     method: 'POST',
     headers: getHeaders(token),
   });
@@ -274,7 +274,7 @@ export async function approveAddon(token: string, addonId: number): Promise<ApiR
 }
 
 export async function rejectAddon(token: string, addonId: number): Promise<ApiResponse<DoctorAddonResponse>> {
-  const res = await fetch(`/api/admin/addons/${addonId}/reject`, {
+  const res = await fetch(`${API_BASE}/admin/addons/${addonId}/reject`, {
     method: 'POST',
     headers: getHeaders(token),
   });

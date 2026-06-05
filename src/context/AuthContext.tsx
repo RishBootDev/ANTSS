@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useCallback } from 'react';
+import { API_BASE } from '@/lib/apiClient';
 
 export type UserRole = 'ROLE_USER' | 'ROLE_ADMIN';
 
@@ -45,7 +46,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const logout = useCallback(() => {
     if (user?.accessToken) {
-      fetch('/api/auth/logout', {
+      fetch(`${API_BASE}/auth/logout`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${user.accessToken}`,

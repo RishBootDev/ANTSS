@@ -13,18 +13,9 @@ export default defineConfig({
     }),
     tailwindcss(),
   ],
-   resolve: {
+  resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
-    },
-  },
-  server: {
-    proxy: {
-      '/api': {
-        target: 'https://api.antss.in',
-        changeOrigin: true,
-        secure: false,
-      },
     },
   },
 })

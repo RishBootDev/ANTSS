@@ -1,4 +1,5 @@
 import type { ApiResponse } from './authService';
+import { API_BASE } from '@/lib/apiClient';
 
 export interface Subscription {
   id: string;
@@ -45,8 +46,7 @@ function getHeaders(token: string) {
   };
 }
 
-// API base — use Vite environment variable VITE_API_BASE if provided, fallback to '/api'
-const API_BASE = (import.meta.env?.VITE_API_BASE as string) ?? '/api';
+
 
 export async function getActiveSubscriptions(token: string): Promise<ApiResponse<Subscription[]>> {
   const res = await fetch(`${API_BASE}/subscriptions/active`, {

@@ -1,3 +1,5 @@
+import { API_BASE } from '@/lib/apiClient';
+
 export type PrescriptionRegistrationPayload = {
   name: string;
   email: string;
@@ -32,7 +34,7 @@ export async function registerPrescription(
   payload: PrescriptionRegistrationPayload,
   options?: { url?: string; signal?: AbortSignal },
 ): Promise<PrescriptionRegistrationResponse> {
-  const endpoint = options?.url ?? '/api/auth/register';
+  const endpoint = options?.url ?? `${API_BASE}/auth/register`;
 
   // Generate a temporary password if not provided
   const tempPassword = `P@ss${Math.random().toString(36).slice(-10)}`;

@@ -1,4 +1,5 @@
 import type { IRegisterRequest } from '../interfaces/IRegisterRequest';
+import { API_BASE } from '@/lib/apiClient';
 
 export type ApiResponse<T = any> = {
   success: boolean;
@@ -37,7 +38,7 @@ export async function register(
   payload: IRegisterRequest,
   options?: { url?: string; signal?: AbortSignal },
 ): Promise<ApiResponse<void>> {
-  const endpoint = options?.url ?? `/api/auth/register`;
+  const endpoint = options?.url ?? `${API_BASE}/auth/register`;
 
   // Map frontend field names → backend field names
   const backendPayload: BackendRegisterPayload = {
@@ -110,7 +111,7 @@ export async function loginUser(
   password: string,
   options?: { signal?: AbortSignal },
 ): Promise<ApiResponse<LoginResponse>> {
-  const res = await fetch('/api/auth/login', {
+  const res = await fetch(`${API_BASE}/auth/login`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ email, password }),
@@ -146,7 +147,7 @@ export async function forgotPassword(
   email: string,
   options?: { signal?: AbortSignal },
 ): Promise<ApiResponse<void>> {
-  const res = await fetch('/api/auth/forgot-password', {
+  const res = await fetch(`${API_BASE}/auth/forgot-password`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ email }),
@@ -183,7 +184,7 @@ export async function resetPassword(
   confirmPassword: string,
   options?: { signal?: AbortSignal },
 ): Promise<ApiResponse<void>> {
-  const res = await fetch('/api/auth/reset-password', {
+  const res = await fetch(`${API_BASE}/auth/reset-password`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ token, newPassword, confirmPassword }),
