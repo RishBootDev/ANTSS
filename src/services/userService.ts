@@ -49,6 +49,19 @@ export interface Doctor {
   status?: string;
 }
 
+export interface Rmo {
+  id: string;
+  userId?: string;
+  rmoName: string;
+  email: string;
+  mobileNumber?: string;
+  employeeCode: string;
+  hospitalId?: number;
+  clinicId?: number;
+  role: 'RMO' | 'NURSE' | 'RECEPTIONIST' | 'STAFF' | string;
+  status?: string;
+}
+
 function getHeaders(token: string) {
   return {
     'Content-Type': 'application/json',
@@ -77,6 +90,18 @@ export async function getHospitals(token: string): Promise<ApiResponse<Hospital[
     success: res.ok,
     message: body.message,
     data: body.data || (Array.isArray(body) ? body : []),
+  };
+}
+
+export async function getHospitalById(token: string, id: number): Promise<ApiResponse<Hospital>> {
+  const res = await fetch(`${API_BASE}/hospitals/${id}`, {
+    headers: getHeaders(token),
+  });
+  const body = await res.json().catch(() => ({}));
+  return {
+    success: res.ok,
+    message: body.message,
+    data: body.data || body,
   };
 }
 
@@ -120,6 +145,18 @@ export async function getClinics(token: string): Promise<ApiResponse<Clinic[]>> 
   };
 }
 
+export async function getClinicById(token: string, id: number): Promise<ApiResponse<Clinic>> {
+  const res = await fetch(`${API_BASE}/clinics/${id}`, {
+    headers: getHeaders(token),
+  });
+  const body = await res.json().catch(() => ({}));
+  return {
+    success: res.ok,
+    message: body.message,
+    data: body.data || body,
+  };
+}
+
 export async function addClinic(token: string, clinic: Omit<Clinic, 'id'>): Promise<ApiResponse<Clinic>> {
   const res = await fetch(`${API_BASE}/clinics`, {
     method: 'POST',
@@ -160,6 +197,18 @@ export async function getDoctors(token: string): Promise<ApiResponse<Doctor[]>> 
   };
 }
 
+export async function getDoctorById(token: string, id: string): Promise<ApiResponse<Doctor>> {
+  const res = await fetch(`${API_BASE}/doctors/${id}`, {
+    headers: getHeaders(token),
+  });
+  const body = await res.json().catch(() => ({}));
+  return {
+    success: res.ok,
+    message: body.message,
+    data: body.data || body,
+  };
+}
+
 export async function addDoctor(token: string, doctor: Partial<Doctor>): Promise<ApiResponse<Doctor>> {
   const res = await fetch(`${API_BASE}/doctors`, {
     method: 'POST',
@@ -185,5 +234,83 @@ export async function updateDoctor(token: string, id: string, doctor: Partial<Do
     success: res.ok,
     message: body.message,
     data: body.data || body,
+  };
+}
+
+export async function deleteDoctor(token: string, id: string): Promise<ApiResponse<void>> {
+  const res = await fetch(`${API_BASE}/doctors/${id}`, {
+    method: 'DELETE',
+    headers: getHeaders(token),
+  });
+  const body = await res.json().catch(() => ({}));
+  return {
+    success: res.ok,
+    message: body.message,
+    data: body.data,
+  };
+}
+
+export async function getRmos(token: string): Promise<ApiResponse<Rmo[]>> {
+  const res = await fetch(`${API_BASE}/rmos`, {
+    headers: getHeaders(token),
+  });
+  const body = await res.json().catch(() => ({}));
+  return {
+    success: res.ok,
+    message: body.message,
+    data: body.data || (Array.isArray(body) ? body : []),
+  };
+}
+
+export async function getRmoById(token: string, id: string): Promise<ApiResponse<Rmo>> {
+  const res = await fetch(`${API_BASE}/rmos/${id}`, {
+    headers: getHeaders(token),
+  });
+  const body = await res.json().catch(() => ({}));
+  return {
+    success: res.ok,
+    message: body.message,
+    data: body.data || body,
+  };
+}
+
+export async function addRmo(token: string, rmo: Omit<Rmo, 'id' | 'userId' | 'status'>): Promise<ApiResponse<Rmo>> {
+  const res = await fetch(`${API_BASE}/rmos`, {
+    method: 'POST',
+    headers: getHeaders(token),
+    body: JSON.stringify(rmo),
+  });
+  const body = await res.json().catch(() => ({}));
+  return {
+    success: res.ok,
+    message: body.message,
+    data: body.data || body,
+  };
+}
+
+export async function updateRmo(token: string, id: string, rmo: Omit<Rmo, 'id' | 'userId' | 'status'>): Promise<ApiResponse<Rmo>> {
+  const res = await fetch(`${API_BASE}/rmos/${id}`, {
+    method: 'PUT',
+    headers: getHeaders(token),
+    body: JSON.stringify(rmo),
+  });
+  const body = await res.json().catch(() => ({}));
+  return {
+    success: res.ok,
+    message: body.message,
+    data: body.data || body,
+  };
+}
+
+export async function deleteRmo(token: string, id: string): Promise<ApiResponse<void>> {
+  const res = await fetch(`${API_BASE}/rmos/${id}`, {
+    method: 'DELETE',
+    headers: getHeaders(token),
+  });
+  const body = await res.json().catch(() => ({}));
+  return {
+    success: res.ok,
+    message: body.message,
+    data: body.data,
   };
 }

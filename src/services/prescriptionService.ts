@@ -36,9 +36,6 @@ export async function registerPrescription(
 ): Promise<PrescriptionRegistrationResponse> {
   const endpoint = options?.url ?? `${API_BASE}/auth/register`;
 
-  // Generate a temporary password if not provided
-  const tempPassword = `P@ss${Math.random().toString(36).slice(-10)}`;
-
   // Map to backend RegisterRequest field names
   const body = JSON.stringify({
     fullName: payload.name,
@@ -51,8 +48,6 @@ export async function registerPrescription(
     state: payload.state,
     packageId: payload.packageId ?? 1,
     allowedDoctors: payload.doctors,       // doctors → allowedDoctors
-    password: tempPassword,
-    confirmPassword: tempPassword,
   });
 
   const res = await fetch(endpoint, {

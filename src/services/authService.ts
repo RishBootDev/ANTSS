@@ -15,15 +15,13 @@ type BackendRegisterPayload = {
   fullName: string;
   email: string;
   mobileNumber: string;
-  userType: 'HOSPITAL' | 'CLINIC' | 'DOCTOR';
+  userType: 'HOSPITAL' | 'CLINIC';
   entityName: string;
   addressLine1?: string;
   city?: string;
   state?: string;
   pincode?: string;
   packageId: number;
-  password: string;
-  confirmPassword: string;
   allowedHospitals?: number;
   allowedClinics?: number;
   allowedDoctors?: number;
@@ -50,9 +48,8 @@ export async function register(
     addressLine1: payload.address ?? '',      // address → addressLine1
     city: payload.city ?? '',
     state: payload.state ?? '',
+    pincode: payload.pincode ?? '',
     packageId: payload.packageId,
-    password: payload.password,
-    confirmPassword: payload.confirmPassword,
     allowedDoctors: payload.numDoctors,       // numDoctors → allowedDoctors
   };
 

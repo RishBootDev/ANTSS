@@ -7,6 +7,7 @@ export interface IRegisterRequest {
   address?: string;
   city?: string;
   state?: string;
+  pincode?: string;
   country?: string;
 
   packageId: number;
@@ -14,6 +15,6 @@ export interface IRegisterRequest {
 
   userType?: 'CLINIC' | 'HOSPITAL';
 
-  password: string;
-  confirmPassword: string;
+  password?: string;
+  confirmPassword?: string;
 }

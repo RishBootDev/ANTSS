@@ -32,11 +32,8 @@ export interface DoctorAddon {
 export interface AddDoctorAddonRequest {
   userSubscriptionId: string;
   additionalDoctors: number;
-  facilityType?: 'HOSPITAL' | 'CLINIC';
-  facilityId?: number;
-  entityId?: number;
-  hospitalId?: number;
-  clinicId?: number;
+  entityId: number;
+  entityType: 'HOSPITAL' | 'CLINIC';
 }
 
 function getHeaders(token: string) {
@@ -77,39 +74,19 @@ export async function requestDoctorAddon(
   payload: AddDoctorAddonRequest
 ): Promise<ApiResponse<DoctorAddon>> {
 
-  const url = `${API_BASE}/subscriptions/addons`;
-
-  console.log("=== REQUEST ===");
-  console.log("URL:", url);
-  console.log("Method:", "POST");
-  console.log("Headers:", getHeaders(token));
-  console.log("Payload:", payload);
-  console.log("Payload JSON:", JSON.stringify(payload));
-
-  const res = await fetch(url, {
+  const res = await fetch(`${API_BASE}/subscriptions/addons`, {
     method: 'POST',
     headers: getHeaders(token),
     body: JSON.stringify(payload),
   });
 
-  console.log("=== RESPONSE ===");
-  console.log("Status:", res.status);
-  console.log("Status Text:", res.statusText);
-  console.log("OK:", res.ok);
-
   const body = await res.json().catch(() => ({}));
 
-  console.log("Response Body:", body);
-
-  const response = {
+  return {
     success: res.ok,
     message: body.message,
     data: body.data || body,
   };
-
-  console.log("Parsed Response:", response);
-
-  return response;
 }
 
 // --- New: user subscription summary endpoints ---
@@ -164,4 +141,133 @@ export async function getRemainingDoctorSlots(token: string, userId: string): Pr
     message: body.message,
     data: typeof body.data !== 'undefined' ? body.data : (typeof body === 'number' ? body : undefined),
   };
+}
+
+export async function getSubscriptionHistory(token: string, userId: string): Promise<ApiResponse<IUserSubscriptionSummary[]>> {
+  const res = await fetch(`${API_BASE}/user/subscriptions/${userId}/history`, {
+    headers: getHeaders(token),
+  });
+  const body = await res.json().catch(() => ({}));
+  return { success: res.ok, message: body.message, data: body.data || (Array.isArray(body) ? body : []) };
+}
+
+export async function canAddDoctor(token: string, userId: string): Promise<ApiResponse<boolean>> {
+  const res = await fetch(`${API_BASE}/user/subscriptions/${userId}/can-add-doctor`, { headers: getHeaders(token) });
+  const body = await res.json().catch(() => ({}));
+  return { success: res.ok, message: body.message, data: typeof body.data !== 'undefined' ? body.data : body };
+}
+
+export async function canAddHospital(token: string, userId: string): Promise<ApiResponse<boolean>> {
+  const res = await fetch(`${API_BASE}/user/subscriptions/${userId}/can-add-hospital`, { headers: getHeaders(token) });
+  const body = await res.json().catch(() => ({}));
+  return { success: res.ok, message: body.message, data: typeof body.data !== 'undefined' ? body.data : body };
+}
+
+export async function canAddClinic(token: string, userId: string): Promise<ApiResponse<boolean>> {
+  const res = await fetch(`${API_BASE}/user/subscriptions/${userId}/can-add-clinic`, { headers: getHeaders(token) });
+  const body = await res.json().catch(() => ({}));
+  return { success: res.ok, message: body.message, data: typeof body.data !== 'undefined' ? body.data : body };
+}
+
+export async function canCreatePrescription(token: string, userId: string): Promise<ApiResponse<boolean>> {
+  const res = await fetch(`${API_BASE}/user/subscriptions/${userId}/can-create-prescription`, { headers: getHeaders(token) });
+  const body = await res.json().catch(() => ({}));
+  return { success: res.ok, message: body.message, data: typeof body.data !== 'undefined' ? body.data : body };
+}
+
+export async function getEffectiveAllowedDoctors(token: string, userId: string): Promise<ApiResponse<number>> {
+  const res = await fetch(`${API_BASE}/user/subscriptions/${userId}/effective-allowed-doctors`, { headers: getHeaders(token) });
+  const body = await res.json().catch(() => ({}));
+  return { success: res.ok, message: body.message, data: body.data ?? body };
+}
+
+export async function renewSubscription(token: string, subscriptionId: string): Promise<ApiResponse<IUserSubscriptionSummary>> {
+  const res = await fetch(`${API_BASE}/user/subscriptions/${subscriptionId}/renew`, {
+    method: 'POST',
+    headers: getHeaders(token),
+  });
+  const body = await res.json().catch(() => ({}));
+  return { success: res.ok, message: body.message, data: body.data || body };
+}
+
+export async function upgradeSubscription(token: string, userId: string, newPackageId: number): Promise<ApiResponse<IUserSubscriptionSummary>> {
+  const res = await fetch(`${API_BASE}/user/subscriptions/${userId}/upgrade?newPackageId=${encodeURIComponent(newPackageId)}`, {
+    method: 'POST',
+    headers: getHeaders(token),
+  });
+  const body = await res.json().catch(() => ({}));
+  return { success: res.ok, message: body.message, data: body.data || body };
+}
+
+export async function cancelSubscription(token: string, userId: string, cancelledBy: string): Promise<ApiResponse<void>> {
+  const res = await fetch(`${API_BASE}/user/subscriptions/${userId}/cancel?cancelledBy=${encodeURIComponent(cancelledBy)}`, {
+    method: 'POST',
+    headers: getHeaders(token),
+  });
+  const body = await res.json().catch(() => ({}));
+  return { success: res.ok, message: body.message, data: body.data };
+}
+
+export async function getSubscriptionAddons(token: string, subscriptionId: string): Promise<ApiResponse<DoctorAddon[]>> {
+  const res = await fetch(`${API_BASE}/user/subscriptions/${subscriptionId}/addons`, { headers: getHeaders(token) });
+  const body = await res.json().catch(() => ({}));
+  return { success: res.ok, message: body.message, data: body.data || (Array.isArray(body) ? body : []) };
+}
+
+export async function getActiveSubscriptionAddons(token: string, subscriptionId: string): Promise<ApiResponse<DoctorAddon[]>> {
+  const res = await fetch(`${API_BASE}/user/subscriptions/${subscriptionId}/addons/active`, { headers: getHeaders(token) });
+  const body = await res.json().catch(() => ({}));
+  return { success: res.ok, message: body.message, data: body.data || (Array.isArray(body) ? body : []) };
+}
+
+export async function requestSubscriptionDoctorAddon(
+  token: string,
+  subscriptionId: string,
+  additionalDoctors: number,
+  entityId: number,
+  entityType: 'HOSPITAL' | 'CLINIC',
+): Promise<ApiResponse<number>> {
+  const params = new URLSearchParams({
+    additionalDoctors: String(additionalDoctors),
+    facilityId: String(entityId),
+    facilityType: entityType,
+  });
+  const res = await fetch(`${API_BASE}/user/subscriptions/${subscriptionId}/addons/request?${params}`, {
+    method: 'POST',
+    headers: getHeaders(token),
+  });
+  const body = await res.json().catch(() => ({}));
+  return { success: res.ok, message: body.message, data: body.data ?? body };
+}
+
+export async function allocateDoctor(token: string, subscriptionId: string, doctorId: string, allocationType = 'BASE'): Promise<ApiResponse<void>> {
+  const params = new URLSearchParams({ doctorId, allocationType });
+  const res = await fetch(`${API_BASE}/user/subscriptions/${subscriptionId}/allocate-doctor?${params}`, {
+    method: 'POST',
+    headers: getHeaders(token),
+  });
+  const body = await res.json().catch(() => ({}));
+  return { success: res.ok, message: body.message, data: body.data };
+}
+
+export async function deallocateDoctor(token: string, subscriptionId: string, doctorId: string): Promise<ApiResponse<void>> {
+  const params = new URLSearchParams({ doctorId });
+  const res = await fetch(`${API_BASE}/user/subscriptions/${subscriptionId}/deallocate-doctor?${params}`, {
+    method: 'POST',
+    headers: getHeaders(token),
+  });
+  const body = await res.json().catch(() => ({}));
+  return { success: res.ok, message: body.message, data: body.data };
+}
+
+export async function getLinkedHospitals(token: string, userId: string): Promise<ApiResponse<any[]>> {
+  const res = await fetch(`${API_BASE}/user/subscriptions/${userId}/linked-hospitals`, { headers: getHeaders(token) });
+  const body = await res.json().catch(() => ({}));
+  return { success: res.ok, message: body.message, data: body.data || (Array.isArray(body) ? body : []) };
+}
+
+export async function getLinkedClinics(token: string, userId: string): Promise<ApiResponse<any[]>> {
+  const res = await fetch(`${API_BASE}/user/subscriptions/${userId}/linked-clinics`, { headers: getHeaders(token) });
+  const body = await res.json().catch(() => ({}));
+  return { success: res.ok, message: body.message, data: body.data || (Array.isArray(body) ? body : []) };
 }

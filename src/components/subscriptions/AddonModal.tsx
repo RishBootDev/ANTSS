@@ -97,12 +97,8 @@ export default function AddonModal({
       const res = await requestDoctorAddon(token, {
         userSubscriptionId: subscriptionId,
         additionalDoctors,
-        facilityType: facility.type === 'hospital' ? 'HOSPITAL' : 'CLINIC',
-        facilityId: facility.id,
         entityId: facility.id,
-        ...(facility.type === 'hospital'
-          ? { hospitalId: facility.id }
-          : { clinicId: facility.id }),
+        entityType: facility.type === 'hospital' ? 'HOSPITAL' : 'CLINIC',
       });
 
       if (res.success) {
